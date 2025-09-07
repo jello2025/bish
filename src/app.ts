@@ -7,6 +7,7 @@ import { env } from "./config/env";
 import { notFound } from "./middlewares/notFound";
 import { errorHandler } from "./middlewares/errorHandler";
 import { authRouter } from "./api/auth/auth.routes";
+import { todoRouter } from "./api/todo/todo.routes";
 const app = express();
 dotenv.config();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(morgan("dev"));
 connectDB();
 
 app.use("/api/auth", authRouter);
+app.use("/api/todo", todoRouter);
 
 const PORT = env.PORT || "5000";
 const DB_URL = env.DB_URL;

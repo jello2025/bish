@@ -42,6 +42,38 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      next({
+        status: 400,
+        message: "missing creds",
+      });
+    }
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return next({
+        status: 404,
+        message: "couldnt find user",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user?.passwaord as string);
+
+    if (!isMatch) {
+      next({
+        status: 400,
+        message: "invalid creds",
+      });
+    }
+
+    const payload = { userId: user._id, username: username };
+    const secret = env.JWT_SECRET;
+    const options = { expiresIn: env.JWT_EXP } as jwt.SignOptions;
+    const token = jwt.sign(payload, secret as string, options);
+    res.status(200).json({
+      token: token,
+    });
   } catch (err) {
     next(err);
   }
